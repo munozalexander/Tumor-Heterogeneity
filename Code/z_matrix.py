@@ -1,6 +1,7 @@
 import numpy as np
+import itertools
 
-def create_Z (num_clones, clone_muts):
+def create_Z (num_clones, clone_muts, print_bool=False):
     '''
     num_clones: int for number of clones in [3,4,5]
     clone_muts:
@@ -18,125 +19,31 @@ def create_Z (num_clones, clone_muts):
                         c1c2c3c4c5 ]
 
     '''
-    z_mat = np.zeros()
-    if len(clone_muts) != (2**num_clones - 1): #2^n-1 possible subsets of clones
-        print("Invalid clone_muts list size!")
+    z_mat = []
+
+    #confirm correct clone_muts list, there are 2^n-1 possible non-empty subsets of clones
+    if len(clone_muts) != (2**num_clones - 1):
+        print("Invalid clone_muts list size.")
         return
 
-    if arg1 == 3:
-        for x in range(arg2[0]):
-            dist.append([0,1,0,0])
-        for x in range(arg2[1]):
-            dist.append([0,0,1,0])
-        for x in range(arg2[2]):
-            dist.append([0,0,0,1])
-        for x in range(arg2[3]):
-            dist.append([0,1,1,0])
-        for x in range(arg2[4]):
-            dist.append([0,1,0,1])
-        for x in range(arg2[5]):
-            dist.append([0,0,1,1])
-        for x in range(arg2[6]):
-            dist.append([0,1,1,1])
-    elif arg1 == 4:
-        for x in range(arg2[0]):
-            dist.append([0,1,0,0,0])
-        for x in range(arg2[1]):
-            dist.append([0,0,1,0,0])
-        for x in range(arg2[2]):
-            dist.append([0,0,0,1,0])
-        for x in range(arg2[3]):
-            dist.append([0,0,0,0,1])
-        for x in range(arg2[4]):
-            dist.append([0,1,1,0,0])
-        for x in range(arg2[5]):
-            dist.append([0,1,0,1,0])
-        for x in range(arg2[6]):
-            dist.append([0,1,0,0,1])
-        for x in range(arg2[7]):
-            dist.append([0,0,1,1,0])
-        for x in range(arg2[8]):
-            dist.append([0,0,1,0,1])
-        for x in range(arg2[9]):
-            dist.append([0,0,0,1,1])
-        for x in range(arg2[10]):
-            dist.append([0,1,1,1,0])
-        for x in range(arg2[11]):
-            dist.append([0,1,1,0,1])
-        for x in range(arg2[12]):
-            dist.append([0,1,0,1,1])
-        for x in range(arg2[13]):
-            dist.append([0,0,1,1,1])
-        for x in range(arg2[14]):
-            dist.append([0,1,1,1,1])
     else:
-        for x in range(arg2[0]):
-            dist.append([0,1,0,0,0,0])
-        for x in range(arg2[1]):
-            dist.append([0,0,1,0,0,0])
-        for x in range(arg2[2]):
-            dist.append([0,0,0,1,0,0])
-        for x in range(arg2[3]):
-            dist.append([0,0,0,0,1,0])
-        for x in range(arg2[4]):
-            dist.append([0,0,0,0,0,1])
-        for x in range(arg2[5]):
-            dist.append([0,1,1,0,0,0])
-        for x in range(arg2[6]):
-            dist.append([0,1,0,1,0,0])
-        for x in range(arg2[7]):
-            dist.append([0,1,0,0,1,0])
-        for x in range(arg2[8]):
-            dist.append([0,1,0,0,0,1])
-        for x in range(arg2[9]):
-            dist.append([0,0,1,1,0,0])
-        for x in range(arg2[10]):
-            dist.append([0,0,1,0,1,0])
-        for x in range(arg2[11]):
-            dist.append([0,0,1,0,0,1])
-        for x in range(arg2[12]):
-            dist.append([0,0,0,1,1,0])
-        for x in range(arg2[13]):
-            dist.append([0,0,0,1,0,1])
-        for x in range(arg2[14]):
-            dist.append([0,0,0,0,1,1])
-        for x in range(arg2[15]):
-            dist.append([0,1,1,1,0,0])
-        for x in range(arg2[16]):
-            dist.append([0,1,1,0,1,0])
-        for x in range(arg2[17]):
-            dist.append([0,1,1,0,0,1])
-        for x in range(arg2[18]):
-            dist.append([0,1,0,1,1,0])
-        for x in range(arg2[19]):
-            dist.append([0,1,0,1,0,1])
-        for x in range(arg2[20]):
-            dist.append([0,1,0,0,1,1])
-        for x in range(arg2[21]):
-            dist.append([0,0,1,1,1,0])
-        for x in range(arg2[22]):
-            dist.append([0,0,1,1,0,1])
-        for x in range(arg2[23]):
-            dist.append([0,0,1,0,1,1])
-        for x in range(arg2[24]):
-            dist.append([0,0,0,1,1,1])
-        for x in range(arg2[25]):
-            dist.append([0,1,1,1,1,0])
-        for x in range(arg2[26]):
-            dist.append([0,1,1,1,0,1])
-        for x in range(arg2[27]):
-            dist.append([0,1,1,0,1,1])
-        for x in range(arg2[28]):
-            dist.append([0,1,0,1,1,1])
-        for x in range(arg2[29]):
-            dist.append([0,0,1,1,1,1])
-        for x in range(arg2[30]):
-            dist.append([0,1,1,1,1,1])
-    return dist
+        #generate possible rows for Z, first column should be all zero, then iterate through permutations of 1 and 0
+        possible_seqs = []
+        for num_ones in range(num_clones):
+            possible_seqs += [[0]+np.bincount(xs, minlength=num_clones).tolist()\
+                             for xs in itertools.combinations(range(num_clones), (num_ones+1))]
 
-dist = Z_mtx_creation(3,[4,1,2,0,0,3,5])
-print(np.array(dist))
-# dist = Z_mtx_creation(3,[3,4,1,0,5,1,1])
-# dist2 = Z_mtx_creation(5,[1,1,1,1,1,1,2,3,0,0,0,0,0,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0,5])
-# print(dist)
-# print(dist2)
+        #append possible seqs according to user-defined phylogenetics
+        for pairing_index in range(len(clone_muts)):
+            for i in range(clone_muts[pairing_index]):
+                z_mat.append(possible_seqs[pairing_index])
+
+        #print
+        if print_bool==True:
+            print("Successfully generated Z matrix for %i clones:" % num_clones)
+            print(z_mat)
+        return z_mat
+
+##### EXAMPLES #####
+# dist = create_Z(3,[4,1,2,0,0,3,5], print_bool=True)# dist2 = create_Z(3,[3,4,1,0,5,1,1], print_bool=True)
+# dist3 = create_Z(5,[1,1,1,1,1,1,2,3,0,0,0,0,0,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0,5], print_bool=True)
